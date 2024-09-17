@@ -1,7 +1,7 @@
 import path from "path";
 
 const isImageFile = (fileName: string) => {
-  const extensions = [".jpg", ".jpeg", ".png", ".gif"];
+  const extensions = [".jpg", ".jpeg", ".png"];
   return extensions.includes(path.extname(fileName).toLowerCase());
 };
 

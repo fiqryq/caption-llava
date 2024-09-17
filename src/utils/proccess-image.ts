@@ -3,28 +3,26 @@ import ora from "ora";
 import path from "path";
 import fs from "fs";
 import { T_Response } from "../type/response.js";
-import getLastTwoFolders from "./get-last-two-folder.js";
+import getFilename from "./get-file-name.js";
 
-const processImage = async (imagePath: string) => {
-  const trimPath = getLastTwoFolders(imagePath);
+const processImage = async (imagePath: string, destinationPath: string) => {
+  const trimPath = getFilename(imagePath);
   const spinner = ora(`Processing image: ${trimPath}`).start();
 
   try {
     const imageFile = path.resolve(imagePath);
-
     const image = await fs.promises.readFile(imageFile);
 
     const body = {
-      model: "llava-llama3:8b",
-      prompt: `Generate a concise caption for the following image. The caption should be a plain text description of the scene, up to 200 characters, without any additional metadata or formatting. Here is the image:`,
+      model: "llava:latest",
+      role: "user",
+      prompt: `Generate a concise and descriptive caption for this image. The caption should be human-readable and accurately describe the main subject of the image in a natural, engaging tone.`,
       stream: false,
-      format: "json",
       done: true,
       images: [image.toString("base64")],
     };
 
-    // NOTE : change this latter : http://localhost:11434 is default port for my local dev.
-    const response = await fetch("http://localhost:11434/api/generate", {
+    const response = await fetch(`${process.env.LLAVA_API_URL}/api/generate`, {
       method: "POST",
       body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
@@ -36,11 +34,18 @@ const processImage = async (imagePath: string) => {
 
     const data = (await response.json()) as T_Response;
 
-    fs.writeFile(`${imagePath}.txt`, data.response, (err) => {
-      console.log(err);
-    });
+    const folderName = path.basename(imagePath, path.extname(imagePath));
+    const generatedFolder = path.join(destinationPath, folderName);
 
-    spinner.succeed(`Image ${trimPath} processed successfully!`);
+    await fs.promises.mkdir(generatedFolder, { recursive: true });
+
+    const newImagePath = path.join(generatedFolder, path.basename(imagePath));
+    await fs.promises.copyFile(imagePath, newImagePath);
+
+    const captionPath = path.join(generatedFolder, "caption.txt");
+    await fs.promises.writeFile(captionPath, data.response.trim(), "utf-8");
+
+    spinner.succeed(`Image ${trimPath} processed and saved successfully!`);
   } catch (err: any) {
     spinner.fail(`Error processing image: ${trimPath} - ${err.message}`);
   }
