@@ -11,9 +11,9 @@
   "bin": {
     "caption": "./dist/index.js"
   },
-  "keywords": [],
+  "keywords": ["ollama", "llava"],
   "author": "Fiqry choerudin",
-  "license": "ISC",
+  "license": "MIT",
   "description": "",
   "dependencies": {
     "@types/node": "^22.5.5",
