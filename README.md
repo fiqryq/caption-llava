@@ -17,7 +17,7 @@ To generate captions for your images, use the following command in your terminal
 ```bash
 caption [IMAGE_FOLDER] [DESTINATION_PATH] [TONE]
 ```
-s
+
 ### Example:
 ```bash
 caption ./my-image ./my-output professional
