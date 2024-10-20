@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import path from "path";
 import fs from "fs";
 import isImageFile from "./utils/is-image.js";
@@ -8,6 +10,7 @@ dotenv.config();
 
 const folderPath = process.argv[2];
 const destinationPath = process.argv[3];
+const tone = process.argv[4];
 
 if (!folderPath || !destinationPath) {
   console.error(
@@ -42,7 +45,7 @@ const Main = async () => {
 
     for (const file of imageFiles) {
       const imagePath = path.join(folder, file);
-      await processImage(imagePath, destination);
+      await processImage(imagePath, destination, tone);
     }
   } catch (err: any) {
     console.error(`Error: ${err.message}`);

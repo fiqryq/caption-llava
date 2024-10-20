@@ -5,7 +5,11 @@ import fs from "fs";
 import { T_Response } from "../type/response.js";
 import getFilename from "./get-file-name.js";
 
-const processImage = async (imagePath: string, destinationPath: string) => {
+const processImage = async (
+  imagePath: string,
+  destinationPath: string,
+  tone: string
+) => {
   const trimPath = getFilename(imagePath);
   const spinner = ora(`Processing image: ${trimPath}`).start();
 
@@ -16,7 +20,7 @@ const processImage = async (imagePath: string, destinationPath: string) => {
     const body = {
       model: "llava:latest",
       role: "user",
-      prompt: `Generate a concise and descriptive caption for this image. The caption should be human-readable and accurately describe the main subject of the image in a natural, engaging tone.`,
+      prompt: `Generate a ${tone} caption for this image, along with 5-7 relevant and trending hashtags that relate to the image content. Ensure the hashtags are specific to the image context and optimized for social media visibility.`,
       stream: false,
       done: true,
       images: [image.toString("base64")],
